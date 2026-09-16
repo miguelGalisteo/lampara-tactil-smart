@@ -5,9 +5,12 @@ para la lámpara táctil) dos lámparas más:
 
 - **Lámpara A — ya es "smart"** (gama Ikea TRÅDFRI): trae bombilla o
   driver Zigbee de fábrica.
-- **Lámpara B — normal, sin nada smart**: interruptor corriente y
-  portalámparas estándar (E27/E14), como la mayoría de lámparas de Ikea
-  (FADO, LAUTERS, etc.).
+- **Lámpara B — normal, sin nada smart**: no tiene portalámparas donde
+  meter una bombilla inteligente (LED integrado no reemplazable, como
+  muchos modelos actuales de Ikea). Se controla desde fuera, con un
+  **enchufe/adaptador inteligente Zigbee** en el cable, igual de sencillo
+  que cambiar una bombilla pero sin depender de que el portalámparas sea
+  estándar.
 
 Como no tienes ningún hub Zigebee todavía, la recomendación es **no
 comprar el hub DIRIGERA de Ikea** y en su lugar añadir un **dongle Zigbee
@@ -20,10 +23,10 @@ app, sin depender de la app de Ikea ni de su nube.
 - Un dongle Zigbee USB compatible, p. ej. **Sonoff Zigbee 3.0 USB Dongle
   Plus** (barato y con buen soporte) o **ConBee II**.
 - El mismo Home Assistant que ya tienes corriendo para la lámpara táctil.
-- Una bombilla Zigbee para la lámpara B. Puede ser una **Ikea TRÅDFRI**
-  (regulable, o de color si quieres), o cualquier otra bombilla Zigbee
-  estándar (Zigbee es un protocolo abierto, no hace falta que sea de
-  Ikea).
+- Un **enchufe inteligente Zigbee** para la lámpara B, p. ej. el
+  **Ikea TRETAKT** (el enchufe Zigbee de Ikea) o cualquier otro enchufe
+  Zigbee compatible con ZHA (Nous A1Z, Sonoff ZBMINI, etc. — Zigbee es un
+  protocolo abierto, no hace falta que sea de Ikea).
 
 ## 1. Añadir el dongle Zigbee a Home Assistant
 
@@ -58,35 +61,43 @@ Home Assistant.
 
 ## 3. Convertir la lámpara B (la normal) en smart
 
-Como es una lámpara corriente con interruptor normal, **no hace falta
-tocar cables ni electrónica** (a diferencia de la lámpara táctil): basta
-con cambiar la bombilla.
+Como no tiene bombilla reemplazable, se controla por fuera: el enchufe
+Zigbee va entre la toma de pared y el enchufe de la lámpara — **no hay
+que abrir la lámpara ni tocar ningún cable interno**, es plug-and-play.
 
-1. Desenchufa la lámpara y pon la bombilla Zigbee (TRÅDFRI u otra) en el
-   portalámparas.
-2. **Deja el interruptor físico de la lámpara siempre en posición
-   "encendido"** — a partir de ahora el encendido/apagado real lo hace
-   la bombilla por Zigbee, no el interruptor. Si alguien apaga el
-   interruptor físico, la bombilla se queda sin corriente y no
-   responderá desde el móvil hasta que se vuelva a encender a mano.
-3. Empareja la bombilla igual que en el paso 2 (ZHA → Añadir
-   dispositivo). Tendrás `light.lampara_b`.
+1. Conecta el enchufe Zigbee a la toma de pared.
+2. Enchufa la lámpara al enchufe Zigbee (en vez de directamente a la
+   pared).
+3. **Deja el interruptor propio de la lámpara, si tiene, siempre en
+   posición "encendido"** — a partir de ahora el encendido/apagado real
+   lo hace el enchufe Zigbee, no ese interruptor. Si alguien lo apaga a
+   mano, la lámpara se queda sin corriente y no responderá desde el
+   móvil hasta que se vuelva a encender.
+4. Empareja el enchufe igual que en el paso 2 (ZHA → Añadir
+   dispositivo; en los enchufes suele haber que mantener pulsado su
+   botón físico unos segundos para entrar en modo emparejamiento).
+   Tendrás una entidad `switch.lampara_b` (es un enchufe, controla
+   on/off; no brillo ni color, porque no controla la bombilla
+   directamente).
 
 ## 4. Controlar las tres luces juntas desde el móvil
 
 Para no tener que abrir tres tarjetas distintas en la app:
 
-1. En Home Assistant: **Ajustes → Dispositivos y servicios → Ayudantes →
-   Crear ayudante → Grupo de luces**.
-2. Añade `light.lampara_a`, `light.lampara_b` y el switch de la lámpara
-   táctil (`switch.lampara_tactil`, del proyecto principal — un switch
-   no es un `light`, así que para agruparlo con las otras dos puedes
-   usar un **Grupo de luces** solo con las dos bombillas Zigbee, y un
-   **Grupo de switches/entidades** aparte si quieres un botón único de
-   "todo apagado").
-3. Ponle nombre, p. ej. "Luces salón". Esa entidad nueva aparecerá en la
-   app móvil como un interruptor/dimmer único que enciende o apaga las
-   luces del grupo a la vez.
+`light.lampara_a` (bombilla Zigbee) es un `light`; `switch.lampara_b`
+(enchufe) y `switch.lampara_tactil` (relé del proyecto principal) son
+`switch`. Home Assistant no mezcla tipos en un mismo grupo, así que se
+hacen dos ayudantes:
+
+1. **Ajustes → Dispositivos y servicios → Ayudantes → Crear ayudante →
+   Grupo de luces**, con `light.lampara_a` (aquí controlas brillo/color
+   de la que sí es bombilla inteligente).
+2. **Ajustes → Dispositivos y servicios → Ayudantes → Crear ayudante →
+   Grupo de switches**, con `switch.lampara_b` y `switch.lampara_tactil`
+   (aquí solo on/off).
+3. Ponles nombre, p. ej. "Luz salón (bombilla)" y "Luces salón
+   (enchufes)". Cada una aparece en la app móvil como un interruptor
+   único que controla todo el grupo a la vez.
 4. Opcional: en **Ajustes → Áreas**, crea un área "Salón" y asigna las
    tres luces ahí — la app de Home Assistant tiene una pestaña por área
    con todos los dispositivos de esa zona.
@@ -97,6 +108,6 @@ Para no tener que abrir tres tarjetas distintas en la app:
   (proyecto principal de este repo).
 - Lámpara A (Ikea smart): on/off, brillo y color (si la bombilla lo
   soporta) directamente por Zigbee.
-- Lámpara B (Ikea normal + bombilla Zigbee): on/off y brillo igual que
-  la A, sin haber tocado el cableado.
-- Las tres, agrupadas, controlables desde una única app en el móvil.
+- Lámpara B (Ikea normal, sin bombilla reemplazable + enchufe Zigbee):
+  on/off desde el móvil, sin haber tocado ningún cable ni bombilla.
+- Las tres, controlables desde una única app en el móvil.
