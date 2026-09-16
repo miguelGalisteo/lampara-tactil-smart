@@ -83,6 +83,14 @@ igual que con el dedo) pero requiere abrir la lámpara y soldar. Ver
      para avanzar de modo (ajusta `mode_pulses` en el YAML si tu lámpara
      necesita otro número de pulsos o timing).
 
+## Ampliación: más lámparas (Ikea)
+
+Si además quieres controlar otras lámparas (p. ej. dos de Ikea, una ya
+"smart" y otra normal) desde la misma app, sin montar un ESP32 en cada
+una, ver [`docs/ikea-tradfri.md`](docs/ikea-tradfri.md): se hace por
+Zigbee (dongle USB + Home Assistant), y la lámpara normal se convierte
+con solo cambiar la bombilla.
+
 ## Estructura del repo
 
 ```
@@ -93,4 +101,5 @@ docs/
   wiring.md                 Diagrama de cableado (Opción A)
   comportamiento-lampara.md Cómo comprobar cómo reacciona tu lámpara
   opcion-b-simular-toque.md Guía avanzada: simular el toque real
+  ikea-tradfri.md            Ampliación: sumar lámparas Ikea por Zigbee
 ```
